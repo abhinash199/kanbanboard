@@ -14,7 +14,7 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("authToken");
     const user = localStorage.getItem("user");
     const isLogin = JSON.parse(localStorage.getItem("isLogin"));
-
+    
     // If valid authentication details are found, set them in the state
     if (token && user && isLogin) {
       setAuth({ token, user, isLogin });
@@ -22,6 +22,10 @@ const AuthProvider = ({ children }) => {
       const currentPath = location.pathname;
       if (currentPath == "/dashboard" || currentPath == "/taskboard") {
         navigate(`${currentPath}`);
+      }else if(currentPath == "/"){
+        navigate('/dashboard')
+      }else{
+        navigate('/not-found')
       }
     }
   }, []);
