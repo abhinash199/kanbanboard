@@ -7,10 +7,14 @@ import { ToastContainer } from "react-toastify";
 import "./App.css";
 import Spinner from "react-bootstrap/Spinner";
 
+
+
 // Lazy load components to optimize performance by splitting code into chunks
 const TaskBoard = lazy(() => import("./components/TaskBoard"));
 const Signup = lazy(() => import("./components/auth/SignUp"));
 const Login = lazy(() => import("./components/auth/Login"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const NotFound = lazy(() => import("./components/Notfound"));
 
 const App = () => {
   return (
@@ -38,10 +42,19 @@ const App = () => {
               path="/dashboard"
               element={
                 <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+             <Route
+              path="/taskboard"
+              element={
+                <PrivateRoute>
                   <TaskBoard />
                 </PrivateRoute>
               }
             />
+             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         {/* ToastContainer to display toast notifications */}

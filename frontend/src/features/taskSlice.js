@@ -1,57 +1,75 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Initial state with an empty array of tasks
-const initialTasks = [];
-
-// Create a slice for task management
-const taskSlice = createSlice({
-  name: 'tasks', // Name of the slice
+// Create a slice of the Redux store for tasks
+export const taskSlice = createSlice({
+  name: "tasks",
   initialState: {
-    tasks: initialTasks, // Initial state with tasks array
+    tasks: [], // Initial state containing an empty array of tasks
   },
   reducers: {
-    // Action to add a new task
+    // Reducer to set the tasks state with a payload
+    setTasks: (state, action) => {
+      state.tasks = action.payload;
+    },
+    // Reducer to add a new task to the tasks state
     addTask: (state, action) => {
-      state.tasks.push(action.payload); // Add the new task to the tasks array
+      state.tasks.push(action.payload);
     },
-    
-    // Action to delete a task by ID
+    // Reducer to delete a task from the tasks state by its id
     deleteTask: (state, action) => {
-      state.tasks = state.tasks.filter(task => task.id !== action.payload); // Remove the task with the given ID
+      state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
-    
-    // Action to update an existing task
+    // Reducer to update an existing task in the tasks state
     updateTask: (state, action) => {
-      const { id, name, priority, deadline } = action.payload;
-      const existingTask = state.tasks.find(task => task.id === id); // Find the task to update
-      if (existingTask) {
-        existingTask.name = name; // Update task name
-        existingTask.priority = priority; // Update task priority
-        existingTask.deadline = deadline; // Update task deadline
+      const index = state.tasks.findIndex(
+        (task) => task.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.tasks[index] = action.payload;
       }
     },
-    
-    // Action to move a task to a different stage
+    // Reducer to move a task to a different stage
     moveTask: (state, action) => {
       const { taskId, stage } = action.payload;
-      const taskToMove = state.tasks.find(task => task.id === taskId); // Find the task to move
-      if (taskToMove) {
-        taskToMove.stage = stage; // Update the stage of the task
+      const task = state.tasks.find((task) => task.id === taskId);
+      if (task) {
+        task.stage = stage;
       }
     },
-    
-    // New action to reorder tasks within the same stage
+    // Reducer to reorder tasks within the same stage
     reorderTask: (state, action) => {
       const { sourceIndex, destinationIndex, stage } = action.payload;
-      const tasksInStage = state.tasks.filter(task => task.stage === stage); // Get tasks in the same stage
-      const [removedTask] = tasksInStage.splice(sourceIndex, 1); // Remove the task from the source index
-      tasksInStage.splice(destinationIndex, 0, removedTask); // Insert the removed task at the destination index
+      const tasksInStage = state.tasks.filter((task) => task.stage === stage);
+      const [reorderedTask] = tasksInStage.splice(sourceIndex, 1);
+      tasksInStage.splice(destinationIndex, 0, reorderedTask);
+
+      state.tasks = state.tasks
+        .filter((task) => task.stage !== stage)
+        .concat(tasksInStage);
     },
   },
 });
 
-// Export the actions to be used in components
-export const { addTask, deleteTask, updateTask, moveTask, reorderTask } = taskSlice.actions;
+export const {
+  setTasks,
+  addTask,
+  deleteTask,
+  updateTask,
+  moveTask,
+  reorderTask,
+} = taskSlice.actions;
 
-// Export the reducer to be used in the Redux store
+//fetch tasks from the API
+export const fetchTasks = () => async (dispatch) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_JSON_API_URL}/tasks`
+    );
+    dispatch(setTasks(response.data));
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+  }
+};
+
 export default taskSlice.reducer;

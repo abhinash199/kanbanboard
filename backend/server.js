@@ -9,7 +9,7 @@ require('dotenv').config(); // Import and configure dotenv to load environment v
 const app = express();
 
 // Define the port on which the server will listen. Defaults to 5000 if not specified in environment variables
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 // Middleware setup
 app.use(bodyParser.json()); // Parse JSON bodies from incoming requests
