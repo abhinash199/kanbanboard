@@ -24,7 +24,7 @@ const Login = () => {
 
   // Base API url
   const API_URL = process.env.REACT_APP_API_URL;
-
+  const GOOGLE_SITEKEY= process.env.REACT_APP_GOOGLE__SITE_KEY;
 
   // Effect to reset reCAPTCHA value on component mount
   useEffect(() => {
@@ -88,7 +88,7 @@ const Login = () => {
           const isLogin = true;
          
           // Show success toast and redirect to dashboard
-          toast.success("Login successful!", {
+          toast.success("Login successfull", {
             autoClose: 1000, // Close the toast after 1 second
             onClose: () =>{
                 login(res.data.token, res.data.name, isLogin);
@@ -124,7 +124,7 @@ const Login = () => {
       if (res.data.token) {
         const isLogin = true;
         // Show success toast and redirect to dashboard
-        toast.success("Google login successful!", {
+        toast.success("Google login successfull", {
           autoClose: 1000,
           onClose: () =>{
             login(res.data.token, res.data.username, isLogin);
@@ -203,7 +203,7 @@ const Login = () => {
 
               <ReCAPTCHA
                 className="mt-3"
-                sitekey="6LeTGRMqAAAAALlakjWFw2aPAvmshBIfFk4rwevO"
+                sitekey= {`${GOOGLE_SITEKEY}`}
                 onChange={(value) => setRecaptchaValue(value)}
               />
               <Button variant="primary" type="submit" className="mt-3 w-100">
