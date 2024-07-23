@@ -8,19 +8,15 @@ export const taskSlice = createSlice({
     tasks: [], // Initial state containing an empty array of tasks
   },
   reducers: {
-    // Reducer to set the tasks state with a payload
     setTasks: (state, action) => {
       state.tasks = action.payload;
     },
-    // Reducer to add a new task to the tasks state
     addTask: (state, action) => {
       state.tasks.push(action.payload);
     },
-    // Reducer to delete a task from the tasks state by its id
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
-    // Reducer to update an existing task in the tasks state
     updateTask: (state, action) => {
       const index = state.tasks.findIndex(
         (task) => task.id === action.payload.id
@@ -29,7 +25,6 @@ export const taskSlice = createSlice({
         state.tasks[index] = action.payload;
       }
     },
-    // Reducer to move a task to a different stage
     moveTask: (state, action) => {
       const { taskId, stage } = action.payload;
       const task = state.tasks.find((task) => task.id === taskId);
@@ -37,7 +32,6 @@ export const taskSlice = createSlice({
         task.stage = stage;
       }
     },
-    // Reducer to reorder tasks within the same stage
     reorderTask: (state, action) => {
       const { sourceIndex, destinationIndex, stage } = action.payload;
       const tasksInStage = state.tasks.filter((task) => task.stage === stage);

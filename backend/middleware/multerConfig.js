@@ -1,6 +1,6 @@
 // Import required modules
 const multer = require('multer'); // Import multer for handling file uploads
-const path = require('path'); // Import path for handling file paths
+
 
 // Set up storage for uploaded files
 const storage = multer.diskStorage({
@@ -10,18 +10,18 @@ const storage = multer.diskStorage({
     },
     // Define the filename for uploaded files
     filename: function (req, file, cb) {
-        // Use a timestamp and the original file name to create a unique filename
+       
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
 // File filter to accept only certain file types
 const fileFilter = (req, file, cb) => {
-    // Define allowed file MIME types
+   
     const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
-    // Check if the file type is allowed
+   
     if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true); // Accept the file
+        cb(null, true); 
     } else {
         cb(new Error('Invalid file type'), false); // Reject the file
     }

@@ -1,5 +1,5 @@
 // Import required modules
-const mongoose = require('mongoose'); // Import Mongoose for MongoDB schema and model
+const mongoose = require('mongoose'); 
 const bcrypt = require('bcryptjs'); // Import bcrypt for hashing passwords
 
 // Define the User schema

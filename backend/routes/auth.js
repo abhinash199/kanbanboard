@@ -64,7 +64,9 @@ router.post('/login', async (req, res) => {
         // Generate a JWT token for the authenticated user
         const payload = { userId: user._id };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token, name: user.name }); // Send the token and user name in response
+       // res.json({ token, name: user.name});
+        res.json({ token, name: user.name,userID:user._id  });
+        
     } catch (err) {
         console.error(err.message); // Log any errors
         res.status(500).send('Server error'); // Send a generic server error message
@@ -94,12 +96,11 @@ router.post('/google-login', async (req, res) => {
         // Generate a JWT token for the authenticated user
         const jwtPayload = { userId: user._id };
         const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token, username: user.name }); // Send the token and user name in response
+        res.json({ token, name: user.name, userID:user._id}); // Send the token and user name in response
     } catch (err) {
         console.error('Error verifying Google token:', err); // Log any errors
         res.status(401).json({ message: 'Invalid Google token' }); // Send an error response for invalid Google token
     }
 });
 
-// Export the router to use in other parts of the application
 module.exports = router;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector for Redux actions and state
+import { useDispatch, useSelector } from "react-redux";
+// Import Redux actions for task management
 import {
   addTask,
   deleteTask,
@@ -8,7 +9,7 @@ import {
   moveTask,
   reorderTask,
   setTasks,
-} from "../features/taskSlice"; // Import Redux actions for task management
+} from "../features/taskSlice";
 import { FaArrowRight, FaTrashAlt } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa6";
 import { MdDelete, MdModeEdit, MdOutlineUpdate } from "react-icons/md";
@@ -19,12 +20,12 @@ import {
 } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
+import { AuthContext } from "../context/AuthContext";
 const TaskBoard = () => {
-  const dispatch = useDispatch(); // Dispatch Redux actions
+  const dispatch = useDispatch();
   const tasks = useSelector((state) => state.tasks.tasks); // Select tasks from Redux state
   const [isDragging, setIsDragging] = useState(false); // State to manage drag status
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   // State to manage new task form
   const [newTask, setNewTask] = useState({
@@ -33,23 +34,25 @@ const TaskBoard = () => {
     deadline: "",
   });
 
-  const [editTask, setEditTask] = useState(null); // State to manage task editing
-  const [draggedTask, setDraggedTask] = useState(null); // State to manage dragged task
+  const [editTask, setEditTask] = useState(null);
+  const [draggedTask, setDraggedTask] = useState(null);
   const [draggedOverIndex, setDraggedOverIndex] = useState(null); // State to manage index of dragged over item
   const [showTrashConfirm, setShowTrashConfirm] = useState(false); // State to manage trash confirmation modal
-  const JSON_API_URL = process.env.REACT_APP_JSON_API_URL; // Base URL for API
-
-  // Fetch tasks from JSON server on component mount
+  const JSON_API_URL = process.env.REACT_APP_JSON_API_URL;
+  const { auth } = React.useContext(AuthContext);
+  // Fetch tasks for the authenticated user
   useEffect(() => {
-    axios
-      .get(`${JSON_API_URL}/tasks`)
-      .then((response) => {
-        dispatch(setTasks(response.data)); // Dispatch tasks to Redux store
-      })
-      .catch((error) => {
-        console.error("Error fetching tasks:", error); // Log errors
-      });
-  }, [dispatch]);
+    if (auth.userID) {
+      axios
+        .get(`${JSON_API_URL}/tasks?userID=${auth.userID}`)
+        .then((response) => {
+          dispatch(setTasks(response.data));
+        })
+        .catch((error) => {
+          console.error("Error fetching tasks:", error);
+        });
+    }
+  }, [auth.userID, dispatch]);
 
   // Handle input changes in the new task form
   const handleInputChange = (e) => {
@@ -67,16 +70,20 @@ const TaskBoard = () => {
       return;
     } else {
       axios
-        .post(`${JSON_API_URL}/tasks`, { ...newTask, stage: 0 })
+        .post(`${JSON_API_URL}/tasks`, {
+          ...newTask,
+          userID: auth.userID,
+          stage: 0,
+        })
         .then((response) => {
-          dispatch(addTask(response.data)); // Dispatch new task to Redux store
+          dispatch(addTask(response.data));
           setNewTask({ name: "", priority: "low", deadline: "" }); // Reset form
           toast.success("New Task Created Successfully!", {
             autoClose: 2000,
           });
         })
         .catch((error) => {
-          console.error("Error creating task:", error); // Log errors
+          console.error("Error creating task:", error);
         });
     }
   };
@@ -114,7 +121,7 @@ const TaskBoard = () => {
         dispatch(moveTask({ taskId, stage: newStage })); // Dispatch task movement to Redux store
       })
       .catch((error) => {
-        console.error("Error moving task:", error); // Log errors
+        console.error("Error moving task:", error);
       });
   };
 
@@ -144,13 +151,13 @@ const TaskBoard = () => {
         .then((response) => {
           dispatch(updateTask(response.data)); // Dispatch task update to Redux store
           setEditTask(null); // Clear edit state
-          setNewTask({ name: "", priority: "low", deadline: "" }); // Reset form
+          setNewTask({ name: "", priority: "low", deadline: "" });
           toast.success("Updated Successfully", {
             autoClose: 2000,
           });
         })
         .catch((error) => {
-          console.error("Error updating task:", error); // Log errors
+          console.error("Error updating task:", error);
         });
     }
   };
@@ -201,7 +208,7 @@ const TaskBoard = () => {
           dispatch(moveTask({ taskId: draggedTask.id, stage })); // Dispatch task movement to Redux store
         })
         .catch((error) => {
-          console.error("Error dropping task:", error); // Log errors
+          console.error("Error dropping task:", error);
         });
     }
     setIsDragging(false);
@@ -245,15 +252,18 @@ const TaskBoard = () => {
 
   return (
     <div className="container mt-4">
+      <div className="d-flex justify-content-center align-items-center md-px-4" style={{marginBottom:"30px"}}>
       <div
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", width: "100px" }}
         className="p-2 mb-2"
         onClick={() => navigate("/dashboard")}
       >
         <FaArrowLeft size={20} /> Back
       </div>
 
-      <h2 className="text-center mb-4">Task Management Board</h2>
+      <h2 className="text-center mx-auto">Task Management Board</h2>
+      </div>
+      
       <div className="row task-creation">
         <div className="col-md-4">
           <input

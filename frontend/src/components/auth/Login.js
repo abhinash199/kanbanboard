@@ -6,6 +6,7 @@ import { Col, Form, Container, Row, Button } from "react-bootstrap";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
+import ButtonComponent from "../common/ButtonComponent";
 
 const Login = () => {
   // State to hold reCAPTCHA value
@@ -24,7 +25,7 @@ const Login = () => {
 
   // Base API url
   const API_URL = process.env.REACT_APP_API_URL;
-  const GOOGLE_SITEKEY= process.env.REACT_APP_GOOGLE__SITE_KEY;
+  const GOOGLE_SITEKEY = process.env.REACT_APP_GOOGLE__SITE_KEY;
 
   // Effect to reset reCAPTCHA value on component mount
   useEffect(() => {
@@ -79,21 +80,17 @@ const Login = () => {
     if (Object.keys(formErrors).length === 0 && recaptchaValue) {
       try {
         // Send login request to the server
-        const res = await axios.post(
-          `${API_URL}/api/auth/login`,
-          formData
-        );
+        const res = await axios.post(`${API_URL}/api/auth/login`, formData);
         if (res.data.token) {
-          console.log(res, "response");
           const isLogin = true;
-         
+          console.log(res, "response");
           // Show success toast and redirect to dashboard
           toast.success("Login successfull", {
             autoClose: 1000, // Close the toast after 1 second
-            onClose: () =>{
-                login(res.data.token, res.data.name, isLogin);
-                navigate("/dashboard");
-            } , // Redirect after the toast closes
+            onClose: () => {
+              login(res.data.token, res.data.name, isLogin, res.data.userID);
+              navigate("/dashboard");
+            }, // Redirect after the toast closes
           });
         }
       } catch (err) {
@@ -115,23 +112,19 @@ const Login = () => {
   // Handle successful Google login
   const handleGoogleSuccess = async (response) => {
     try {
-      const res = await axios.post(
-        `${API_URL}/api/auth/google-login`,
-        {
-          tokenId: response.credential,
-        }
-      );
+      const res = await axios.post(`${API_URL}/api/auth/google-login`, {
+        tokenId: response.credential,
+      });
       if (res.data.token) {
         const isLogin = true;
         // Show success toast and redirect to dashboard
         toast.success("Google login successfull", {
           autoClose: 1000,
-          onClose: () =>{
-            login(res.data.token, res.data.username, isLogin);
+          onClose: () => {
+            login(res.data.token, res.data.name, isLogin, res.data.userID);
             navigate("/dashboard");
-          } 
+          },
         });
-       
       }
     } catch (err) {
       console.error(err.response.data);
@@ -172,7 +165,9 @@ const Login = () => {
             </div>
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formBasicEmailOrUsername">
-                <Form.Label className="fw-semibold mt-2">Username or Email address</Form.Label>
+                <Form.Label className="fw-semibold mt-2">
+                  Username or Email address
+                </Form.Label>
                 <Form.Control
                   type="text"
                   name="usernameOrEmail"
@@ -203,12 +198,10 @@ const Login = () => {
 
               <ReCAPTCHA
                 className="mt-3"
-                sitekey= {`${GOOGLE_SITEKEY}`}
+                sitekey={`${GOOGLE_SITEKEY}`}
                 onChange={(value) => setRecaptchaValue(value)}
               />
-              <Button variant="primary" type="submit" className="mt-3 w-100">
-                Login
-              </Button>
+              <ButtonComponent name="Login" />
             </Form>
 
             <p className="mt-3">

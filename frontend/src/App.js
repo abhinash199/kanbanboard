@@ -7,9 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "./App.css";
 import Spinner from "react-bootstrap/Spinner";
 
-
-
-// Lazy load components to optimize performance by splitting code into chunks
+// Lazy load components to optimize performance
 const TaskBoard = lazy(() => import("./components/TaskBoard"));
 const Signup = lazy(() => import("./components/auth/SignUp"));
 const Login = lazy(() => import("./components/auth/Login"));
@@ -19,7 +17,6 @@ const NotFound = lazy(() => import("./components/Notfound"));
 const App = () => {
   return (
     <>
-      {/* Provide authentication context to the application */}
       <AuthProvider>
         <Suspense
           // Fallback UI while lazy-loaded components are being fetched
@@ -30,8 +27,6 @@ const App = () => {
           }
         >
           <Header />
-
-          {/* Define routes for different pages */}
           <Routes>
             {/* Route for signup page */}
             <Route path="/signup" element={<Signup />} />
@@ -46,7 +41,7 @@ const App = () => {
                 </PrivateRoute>
               }
             />
-             <Route
+            <Route
               path="/taskboard"
               element={
                 <PrivateRoute>
@@ -54,7 +49,7 @@ const App = () => {
                 </PrivateRoute>
               }
             />
-             <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         {/* ToastContainer to display toast notifications */}
